@@ -44,6 +44,7 @@ const CATEGORY_SIDEBAR_MAP = {
 let allItems = [];
 let currentFilter = 'all';
 let selectedItemId = null; // Armazena o ID do item selecionado atualmente
+let selectedIds = new Set(); // IDs selecionados via checkbox (logins)
 
 // --- Inicialização ---
 async function init() {
@@ -89,6 +90,22 @@ function bindEvents() {
       selectCategory(key);
     });
   }
+
+  // Floating action buttons handlers
+  const btnDeleteSelection = document.getElementById('btn-delete-selection');
+  const btnCancelSelection = document.getElementById('btn-cancel-selection');
+  if (btnDeleteSelection) btnDeleteSelection.addEventListener('click', async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm('Excluir itens selecionados?')) return;
+    allItems = allItems.filter(i => !selectedIds.has(i.id));
+    selectedIds.clear();
+    await VaultService.saveAll(allItems);
+    selectCategory('logins');
+    hideFab();
+  });
+  if (btnCancelSelection) btnCancelSelection.addEventListener('click', () => {
+    clearSelection();
+  });
 }
 
 function setFilter(type) {
@@ -154,14 +171,31 @@ function renderLoginsCards(container) {
       const card = document.createElement('div');
       card.className = 'card category-card';
       card.innerHTML = `
+        <label class="card-select"><input type="checkbox" class="card-checkbox" data-id="${item.id}"></label>
         <div class="item-icon-box"><img src="${faviconUrl}" alt="icon" style="width:32px;height:32px;border-radius:6px;background:#fff;"></div>
         <div class="category-info">
-          <h4>${escapeHtml(item.site)}</h4>
-          <p>${escapeHtml(item.username)}</p>
+          <h4 title="${escapeHtml(item.site)}">${escapeHtml(item.site)}</h4>
+          <p title="${escapeHtml(item.username)}">${escapeHtml(item.username)}</p>
         </div>
       `;
-      // Clique para abrir sidebar de edição
-      card.addEventListener('click', () => {
+      // Checkbox handling
+      const checkbox = card.querySelector('.card-checkbox');
+      if (checkbox) {
+        // Reflect existing selection
+        checkbox.checked = selectedIds.has(item.id);
+        checkbox.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+        });
+        checkbox.addEventListener('change', (ev) => {
+          ev.stopPropagation();
+          if (checkbox.checked) selectedIds.add(item.id); else selectedIds.delete(item.id);
+          updateFab();
+        });
+      }
+      // Clique no restante do card abre a sidebar de edição
+      card.addEventListener('click', (e) => {
+        // if clicked on checkbox, ignore (handled above)
+        if (e.target.closest('.card-select')) return;
         openEditSidebar(item);
       });
       // Sidebar de edição de login
@@ -234,6 +268,32 @@ function renderLoginsCards(container) {
     });
   }
   container.appendChild(cardsView);
+}
+
+function updateFab() {
+  const fab = document.getElementById('fab-actions');
+  if (!fab) return;
+  if (selectedIds.size > 0) {
+    fab.classList.remove('hidden');
+    // allow transition to kick in
+    requestAnimationFrame(() => fab.classList.add('show'));
+  } else {
+    fab.classList.remove('show');
+    setTimeout(() => fab.classList.add('hidden'), 250);
+  }
+}
+
+function hideFab() {
+  const fab = document.getElementById('fab-actions');
+  if (!fab) return;
+  fab.classList.remove('show');
+  setTimeout(() => fab.classList.add('hidden'), 250);
+}
+
+function clearSelection() {
+  selectedIds.clear();
+  document.querySelectorAll('.card-checkbox').forEach(cb => cb.checked = false);
+  hideFab();
 }
 
 // Garante que ao clicar em qualquer botão da sidebar, a lógica active é aplicada

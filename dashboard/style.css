@@ -235,6 +235,49 @@ body { background: var(--bg-app); color: var(--text-main); height: 100vh; overfl
   background: #f7fafc;
   transform: none;
 }
+.card-select {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+.card-select input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+/* Floating action buttons (bottom-right) */
+.fab-actions {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 300;
+  transform: translateY(12px);
+  opacity: 0;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+.fab-actions.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+.fab-actions .btn-danger {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.fab-actions .btn-secondary {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
 .item-icon-box {
   width: 48px;
   height: 48px;
