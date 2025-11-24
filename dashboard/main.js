@@ -27,6 +27,20 @@ const elements = {
   }
 };
 
+// Category grid (dashboard)
+elements.categoryGrid = document.getElementById('category-grid');
+
+// Mapeamento simples entre chave da categoria e id do botão na sidebar
+const CATEGORY_SIDEBAR_MAP = {
+  'logins': 'nav-logins',
+  'passkeys': 'nav-passkeys',
+  'payments': 'nav-payments',
+  'secure-notes': 'nav-secure-notes',
+  'personal-info': 'nav-personal-info',
+  'ids': 'nav-ids',
+  'sharing-center': 'nav-sharing-center'
+};
+
 let allItems = [];
 let currentFilter = 'all';
 let selectedItemId = null; // Armazena o ID do item selecionado atualmente
@@ -65,6 +79,16 @@ function bindEvents() {
   // Sidebar Filters
   if (elements.filterBtns.all) elements.filterBtns.all.addEventListener('click', () => setFilter('all'));
   if (elements.filterBtns.weak) elements.filterBtns.weak.addEventListener('click', () => setFilter('weak'));
+
+  // Category grid click (sync with sidebar)
+  if (elements.categoryGrid) {
+    elements.categoryGrid.addEventListener('click', (e) => {
+      const card = e.target.closest('.category-card');
+      if (!card) return;
+      const key = card.dataset.key;
+      selectCategory(key);
+    });
+  }
 }
 
 function setFilter(type) {
@@ -76,6 +100,157 @@ function setFilter(type) {
   renderApp();
 }
 
+// Marca o botão correspondente na sidebar quando uma categoria é selecionada
+function selectCategory(key) {
+  // Remove active de todos os botões
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  // Marca o botão correspondente, se existir
+  const btnId = CATEGORY_SIDEBAR_MAP[key];
+  const btn = btnId ? document.getElementById(btnId) : null;
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    // fallback para o botão 'Todos os itens' se não existir mapeamento
+    const fallback = document.getElementById('nav-all');
+    if (fallback) fallback.classList.add('active');
+  }
+  // Exibe o grid só em 'Todos os itens' e exibe cards de logins em 'logins'
+  const allItemsView = document.getElementById('all-items-view');
+  const detailsPane = document.getElementById('details-pane');
+  if (allItemsView && detailsPane) {
+    if (key === 'all' || key === undefined) {
+      allItemsView.style.display = '';
+      // Remove cards de logins se existirem
+      const loginsCards = detailsPane.querySelector('#logins-cards-view');
+      if (loginsCards) loginsCards.remove();
+    } else if (key === 'logins') {
+      allItemsView.style.display = 'none';
+      renderLoginsCards(detailsPane);
+    } else {
+      allItemsView.style.display = 'none';
+      // Remove cards de logins se existirem
+      const loginsCards = detailsPane.querySelector('#logins-cards-view');
+      if (loginsCards) loginsCards.remove();
+    }
+  }
+}
+
+// Renderiza os cards de logins salvos
+function renderLoginsCards(container) {
+  // Remove cards antigos se existirem
+  const old = container.querySelector('#logins-cards-view');
+  if (old) old.remove();
+  // Cria o container
+  const cardsView = document.createElement('div');
+  cardsView.id = 'logins-cards-view';
+  cardsView.className = 'category-grid';
+  // Se não houver itens, mostra mensagem
+  if (!allItems.length) {
+    cardsView.innerHTML = `<div class="empty-state">Nenhum login salvo.</div>`;
+  } else {
+    allItems.forEach(item => {
+      const domain = getDomain(item.site);
+      const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+      const card = document.createElement('div');
+      card.className = 'card category-card';
+      card.innerHTML = `
+        <div class="item-icon-box"><img src="${faviconUrl}" alt="icon" style="width:32px;height:32px;border-radius:6px;background:#fff;"></div>
+        <div class="category-info">
+          <h4>${escapeHtml(item.site)}</h4>
+          <p>${escapeHtml(item.username)}</p>
+        </div>
+      `;
+      // Clique para abrir sidebar de edição
+      card.addEventListener('click', () => {
+        openEditSidebar(item);
+      });
+      // Sidebar de edição de login
+      // Sidebar de edição de login
+      function openEditSidebar(item) {
+        const sidebar = document.getElementById('edit-sidebar');
+        if (!sidebar) return;
+        // Preenche campos
+        document.getElementById('sidebar-edit-site').value = item.site || '';
+        document.getElementById('sidebar-edit-user').value = item.username || '';
+        document.getElementById('sidebar-edit-pass').value = item.password || '';
+        const passInput = document.getElementById('sidebar-edit-pass');
+        const toggleBtn = document.getElementById('btn-toggle-pass-visibility');
+        const icon = document.getElementById('icon-pass-visibility');
+        // Estado inicial: senha escondida
+        passInput.type = 'password';
+        icon.textContent = 'visibility_off';
+        toggleBtn.onclick = () => {
+          if (passInput.type === 'password') {
+            passInput.type = 'text';
+            icon.textContent = 'visibility';
+          } else {
+            passInput.type = 'password';
+            icon.textContent = 'visibility_off';
+          }
+        };
+
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('show');
+
+        // Fecha ao clicar no botão de fechar
+        document.getElementById('btn-close-edit-sidebar').onclick = () => {
+          sidebar.classList.remove('show');
+          setTimeout(() => sidebar.classList.add('hidden'), 300);
+        };
+
+        // Excluir login
+        document.getElementById('btn-delete-login').onclick = async () => {
+          if (confirm('Tem certeza que deseja excluir este login?')) {
+            allItems = allItems.filter(i => i.id !== item.id);
+            await VaultService.saveAll(allItems);
+            sidebar.classList.remove('show');
+            setTimeout(() => sidebar.classList.add('hidden'), 300);
+            selectCategory('logins');
+          }
+        };
+
+        // Salva alterações
+        const form = document.getElementById('edit-sidebar-form');
+        form.onsubmit = async (e) => {
+          e.preventDefault();
+          // Atualiza o item
+          const updated = {
+            ...item,
+            site: document.getElementById('sidebar-edit-site').value,
+            username: document.getElementById('sidebar-edit-user').value,
+            password: document.getElementById('sidebar-edit-pass').value
+          };
+          // Atualiza na lista
+          const idx = allItems.findIndex(i => i.id === item.id);
+          if (idx !== -1) allItems[idx] = updated;
+          await VaultService.saveAll(allItems);
+          sidebar.classList.remove('show');
+          setTimeout(() => sidebar.classList.add('hidden'), 300);
+          // Atualiza cards
+          selectCategory('logins');
+        };
+      }
+      cardsView.appendChild(card);
+    });
+  }
+  container.appendChild(cardsView);
+}
+
+// Garante que ao clicar em qualquer botão da sidebar, a lógica active é aplicada
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    // Descobre a chave da categoria pelo id do botão
+    let key = Object.keys(CATEGORY_SIDEBAR_MAP).find(k => CATEGORY_SIDEBAR_MAP[k] === btn.id);
+    if (!key && btn.id === 'nav-all') key = 'all';
+    selectCategory(key);
+  });
+});
+
+// Garante que ao clicar em 'Todos os itens' na sidebar, o grid aparece
+const navAllBtn = document.getElementById('nav-all');
+if (navAllBtn) {
+  navAllBtn.addEventListener('click', () => selectCategory('all'));
+}
 // Função central que chama as renderizações das duas partes
 function renderApp() {
     const filteredItems = getFilteredItems();

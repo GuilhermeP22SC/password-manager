@@ -16,17 +16,26 @@
         <h1>Meu Cofre</h1>
       </div>
       <nav class="nav-menu">
-        <button class="nav-btn active" id="nav-logins">
+        <button class="nav-btn" id="nav-logins">
           <span class="material-icons-round icon">vpn_key</span> Logins
         </button>
-        <button class="nav-btn" id="nav-all">
-          <span class="material-icons-round icon">dashboard</span> Todos os itens
+        <button class="nav-btn" id="nav-passkeys">
+          <span class="material-icons-round icon">key</span> Passkeys
         </button>
-        <button class="nav-btn" id="nav-fav">
-          <span class="material-icons-round icon">star_border</span> Favoritos
+        <button class="nav-btn" id="nav-payments">
+          <span class="material-icons-round icon">credit_card</span> Payments
         </button>
-        <button class="nav-btn" id="nav-weak">
-          <span class="material-icons-round icon">security_update_warning</span> Senhas Fracas
+        <button class="nav-btn" id="nav-secure-notes">
+          <span class="material-icons-round icon">sticky_note_2</span> Secure Notes
+        </button>
+        <button class="nav-btn" id="nav-personal-info">
+          <span class="material-icons-round icon">person</span> Personal Info
+        </button>
+        <button class="nav-btn" id="nav-ids">
+          <span class="material-icons-round icon">badge</span> IDs
+        </button>
+        <button class="nav-btn" id="nav-sharing-center">
+          <span class="material-icons-round icon">share</span> Sharing Center
         </button>
       </nav>
       <div class="sidebar-footer">
@@ -39,11 +48,94 @@
     <main class="main-split-view">
       
       <section class="details-pane" id="details-pane">
-        <div class="no-selection-placeholder">
+        <div class="no-selection-placeholder hidden" id="placeholder-default">
             <span class="material-icons-round placeholder-icon">touch_app</span>
             <h3>Selecione um item</h3>
             <p>Clique em um login à esquerda para ver os detalhes.</p>
         </div>
+        <div id="all-items-view">
+          <div class="category-grid" id="category-grid">
+            <div class="card category-card" data-key="logins">
+              <div class="item-icon-box"><span class="material-icons-round">vpn_key</span></div>
+              <div class="category-info">
+                <h4>Logins</h4>
+                <p>Contas e credenciais</p>
+              </div>
+            </div>
+            <div class="card category-card" data-key="passkeys">
+              <div class="item-icon-box"><span class="material-icons-round">key</span></div>
+              <div class="category-info">
+                <h4>Passkeys</h4>
+                <p>Chaves e autenticações</p>
+              </div>
+            </div>
+            <div class="card category-card" data-key="payments">
+              <div class="item-icon-box"><span class="material-icons-round">credit_card</span></div>
+              <div class="category-info">
+                <h4>Payments</h4>
+                <p>Cartões e métodos de pagamento</p>
+              </div>
+            </div>
+            <div class="card category-card" data-key="secure-notes">
+              <div class="item-icon-box"><span class="material-icons-round">sticky_note_2</span></div>
+              <div class="category-info">
+                <h4>Secure Notes</h4>
+                <p>Anotações seguras</p>
+              </div>
+            </div>
+            <div class="card category-card" data-key="personal-info">
+              <div class="item-icon-box"><span class="material-icons-round">person</span></div>
+              <div class="category-info">
+                <h4>Personal Info</h4>
+                <p>Dados pessoais</p>
+              </div>
+            </div>
+            <div class="card category-card" data-key="ids">
+              <div class="item-icon-box"><span class="material-icons-round">badge</span></div>
+              <div class="category-info">
+                <h4>IDs</h4>
+                <p>Documentos e identidades</p>
+              </div>
+            </div>
+            <div class="card category-card" data-key="sharing-center">
+              <div class="item-icon-box"><span class="material-icons-round">share</span></div>
+              <div class="category-info">
+                <h4>Sharing Center</h4>
+                <p>Items compartilhados</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Sidebar de edição de login -->
+        <aside class="edit-sidebar hidden" id="edit-sidebar">
+          <form id="edit-sidebar-form">
+            <div class="edit-sidebar-header">
+              <h2>Editar Login</h2>
+              <button type="button" id="btn-close-edit-sidebar" class="btn-icon"><span class="material-icons-round">close</span></button>
+            </div>
+            <div class="form-group">
+              <label for="sidebar-edit-site">Website (URL)</label>
+              <input type="text" id="sidebar-edit-site" required>
+            </div>
+            <div class="form-group">
+              <label for="sidebar-edit-user">Usuário / Email</label>
+              <input type="text" id="sidebar-edit-user" required>
+            </div>
+            <div class="form-group">
+              <label for="sidebar-edit-pass">Senha</label>
+              <div class="input-group">
+                <input type="password" id="sidebar-edit-pass" required>
+                <button type="button" id="btn-toggle-pass-visibility" class="btn-icon" tabindex="-1">
+                  <span class="material-icons-round" id="icon-pass-visibility">visibility_off</span>
+                </button>
+              </div>
+            </div>
+            <div class="edit-sidebar-actions">
+              <button type="button" id="btn-delete-login" class="btn-danger-text" style="margin-right:auto;">Excluir</button>
+              <button type="submit" class="btn-primary">Salvar</button>
+            </div>
+          </form>
+        </aside>
       </section>
 
     </main>
