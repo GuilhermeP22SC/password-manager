@@ -1,3 +1,25 @@
+/* Botões Importar/Exportar CSV */
+.csv-action-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.csv-action-btn:hover, .csv-action-btn:focus {
+  background: var(--primary);
+  color: #fff;
+}
 :root {
   --primary: #0e4e55; /* Dark Teal */
   --primary-hover: #0a3a40;
@@ -259,29 +281,6 @@ body {
 }
 .btn-icon-action:hover { background: #eff2f5; }
 
-/* Footer */
-.app-footer {
-  background: var(--bg-white);
-  border-top: 1px solid var(--border);
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.footer-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-main);
-  cursor: pointer;
-}
-
-.footer-right { display: flex; gap: 12px; }
-.footer-action { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; }
-.footer-action:hover { color: var(--text-main); }
 
 /* --- OVERLAYS (Edit/Gen) --- */
 .overlay {

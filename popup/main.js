@@ -63,14 +63,6 @@ function initNavigation() {
   navButtons.main.addEventListener('click', () => switchMainView('main'));
   navButtons.autofill.addEventListener('click', () => switchMainView('autofill'));
   navButtons.generator.addEventListener('click', () => switchMainView('generator'));
-  
-  // AÇÃO DO BOTÃO DASHBOARD (RODAPÉ)
-  const footerBtn = document.querySelector('.footer-left');
-  if (footerBtn) {
-    footerBtn.addEventListener('click', () => {
-      chrome.tabs.create({ url: chrome.runtime.getURL('dashboard/index.html') });
-    });
-  }
 }
 
 function switchMainView(target) {
@@ -97,6 +89,35 @@ async function initApp() {
   switchMainView('main');
 }
 
+
+// --- Exportar e Importar CSV ---
+function setupCsvImportExport() {
+  const exportBtn = document.getElementById('btn-export-csv');
+  const importBtn = document.getElementById('btn-import-csv');
+  const importInput = document.getElementById('import-csv-input');
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async () => {
+      // Função de exportação será implementada
+      if (vaultModule && vaultModule.exportToCsv) {
+        await vaultModule.exportToCsv();
+      }
+    });
+  }
+
+  if (importBtn && importInput) {
+    importBtn.addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file && vaultModule && vaultModule.importFromCsv) {
+        await vaultModule.importFromCsv(file);
+      }
+      importInput.value = '';
+    });
+  }
+}
+
 initApp();
+setupCsvImportExport();
 
 export { generatorModule, vaultModule, autofillModule, switchMainView };

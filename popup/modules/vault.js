@@ -232,8 +232,102 @@ export function createVaultModule(options) {
     }
   }
 
+  // --- Exportação CSV ---
+  async function exportToCsv() {
+    const items = await VaultService.getAll();
+    if (!items.length) {
+      alert('Nenhuma credencial para exportar.');
+      return;
+    }
+    const header = ['site','username','password'];
+    const rows = items.map(item => [item.site, item.username, item.password]);
+    const csv = [header, ...rows].map(r => r.map(escapeCsv).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'credenciais.csv';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  function escapeCsv(val) {
+    if (val == null) return '';
+    const s = String(val);
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
+  // --- Importação CSV ---
+  async function importFromCsv(file) {
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    if (!lines.length) return alert('Arquivo CSV vazio.');
+    const [header, ...rows] = lines;
+    const cols = header.split(',').map(s => s.trim().toLowerCase());
+    const siteIdx = cols.indexOf('site');
+    const userIdx = cols.indexOf('username');
+    const passIdx = cols.indexOf('password');
+    if (siteIdx === -1 || userIdx === -1 || passIdx === -1) {
+      alert('Cabeçalho CSV inválido. Esperado: site, username, password');
+      return;
+    }
+    const newItems = rows.map(line => {
+      const vals = parseCsvLine(line);
+      return {
+        id: crypto.randomUUID(),
+        site: vals[siteIdx] || '',
+        username: vals[userIdx] || '',
+        password: vals[passIdx] || ''
+      };
+    }).filter(item => item.site && item.password);
+    if (!newItems.length) return alert('Nenhuma credencial válida encontrada.');
+    // Mesclar com existentes, evitando duplicatas (site+username)
+    const current = await VaultService.getAll();
+    const exists = new Set(current.map(item => `${(item.site||'').trim().toLowerCase()}|${(item.username||'').trim().toLowerCase()}`));
+    const filtered = newItems.filter(item => {
+      const key = `${(item.site||'').trim().toLowerCase()}|${(item.username||'').trim().toLowerCase()}`;
+      if (exists.has(key)) return false;
+      exists.add(key);
+      return true;
+    });
+    if (!filtered.length) return alert('Nenhuma credencial nova para importar.');
+    const merged = [...current, ...filtered];
+    await VaultService.saveAll(merged);
+    alert(`${filtered.length} credenciais importadas!`);
+    renderList();
+  }
+
+  function parseCsvLine(line) {
+    const result = [];
+    let cur = '', inQuotes = false;
+    for (let i = 0; i < line.length; ++i) {
+      const c = line[i];
+      if (inQuotes) {
+        if (c === '"') {
+          if (line[i+1] === '"') { cur += '"'; ++i; }
+          else inQuotes = false;
+        } else cur += c;
+      } else if (c === ',') {
+        result.push(cur); cur = '';
+      } else if (c === '"') {
+        inQuotes = true;
+      } else cur += c;
+    }
+    result.push(cur);
+    return result;
+  }
+
   return {
     init,
-    renderList
+    renderList,
+    exportToCsv,
+    importFromCsv
   };
 }

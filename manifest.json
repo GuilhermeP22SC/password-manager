@@ -24,9 +24,6 @@
     {
       "resources": [
         "icons/logo.png",
-        "dashboard/index.html",
-        "dashboard/style.css",
-        "dashboard/main.js",
         "assets/*"
       ],
       "matches": ["<all_urls>"]
