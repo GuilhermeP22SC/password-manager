@@ -38,7 +38,7 @@ const vaultModule = createVaultModule({
   formEl: document.getElementById('form-entry'),
   deleteButton: document.getElementById('btn-delete'),
   saveButton: document.getElementById('btn-save-form'),
-  closeButtons: document.querySelectorAll('.btn-close'),
+  closeButtons: document.querySelectorAll('#view-edit .btn-close'),
   inputs: {
     site: document.getElementById('entry-site'),
     username: document.getElementById('entry-username'),
@@ -84,7 +84,7 @@ async function initApp() {
   try {
     await vaultModule.init();
   } catch (error) {
-    console.error("Erro ao iniciar módulo do cofre:", error);
+    console.error('Erro ao iniciar módulo do cofre:', error);
   }
   switchMainView('main');
 }

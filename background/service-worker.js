@@ -58,6 +58,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     return false;
   }
+
 });
 
 // --- FUNÇÕES AUXILIARES (IGUAIS AO ANTERIOR) ---
@@ -108,3 +109,4 @@ async function handleSaveCredentials(url, username, password) {
   await chrome.storage.local.set({ vault: JSON.stringify(vault) });
   return true;
 }
+

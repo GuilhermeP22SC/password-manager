@@ -292,37 +292,37 @@ async function handleSubmissionAttempt(event) {
   let user, pass;
 
   if (form) {
-      const creds = findCredentialsFromForm(form);
-      user = creds.username;
-      pass = creds.password;
+    const creds = findCredentialsFromForm(form);
+    user = creds.username;
+    pass = creds.password;
   } else {
-      const passInput = document.querySelector('input[type="password"]');
-      if (passInput) {
-          pass = passInput.value;
-          const allInputs = Array.from(document.querySelectorAll('input:not([type="hidden"])'));
-          const idx = allInputs.indexOf(passInput);
-          if (idx > 0) user = allInputs[idx-1].value;
-      }
+    const passInput = document.querySelector('input[type="password"]');
+    if (passInput) {
+      pass = passInput.value;
+      const allInputs = Array.from(document.querySelectorAll('input:not([type="hidden"])'));
+      const idx = allInputs.indexOf(passInput);
+      if (idx > 0) user = allInputs[idx-1].value;
+    }
   }
 
   if (!user || !pass) return;
 
   // Verifica se já existe
   const exists = await chrome.runtime.sendMessage({ 
-      type: 'CHECK_CREDENTIALS_EXIST', 
-      url: window.location.href, 
-      username: user 
+    type: 'CHECK_CREDENTIALS_EXIST', 
+    url: window.location.href, 
+    username: user 
   });
 
   if (!exists) {
-      // NÃO exibe popup aqui. Manda para o background guardar ("Cache")
-      // e espera a próxima página carregar para perguntar.
-      chrome.runtime.sendMessage({
-          type: 'CACHE_TEMP_CREDENTIALS',
-          url: window.location.href,
-          username: user,
-          password: pass
-      });
+    // NÃO exibe popup aqui. Manda para o background guardar ("Cache")
+    // e espera a próxima página carregar para perguntar.
+    chrome.runtime.sendMessage({
+      type: 'CACHE_TEMP_CREDENTIALS',
+      url: window.location.href,
+      username: user,
+      password: pass
+    });
   }
 }
 

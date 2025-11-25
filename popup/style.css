@@ -171,6 +171,10 @@ body {
   cursor: pointer;
 }
 .tab-text:hover { color: var(--text-main); }
+.tab-text.active {
+  color: var(--primary);
+  font-weight: 600;
+}
 
 /* Scroll Area */
 .scroll-area {
@@ -233,6 +237,14 @@ body {
   color: var(--text-muted);
   margin-bottom: 8px;
   padding: 0 4px;
+}
+.list-actions-group {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+.csv-file-input {
+  display: none;
 }
 
 .vault-list {
@@ -473,6 +485,8 @@ body {
   gap: 8px;
 }
 
+
+/* Pagamentos */
 .btn-teal-action:hover {
   background: var(--primary);
 }

@@ -41,45 +41,46 @@
         <button class="tab-text">Notas Seguras</button>
       </div>
       <div class="scroll-area">
-        <div class="section-label">SUGERIDO</div>
-        <div class="card add-card" id="btn-add-hero">
-          <div class="item-icon-box placeholder"><img src="../assets/internet.svg" alt="Internet" style="width:20px;height:20px;"></div>
-          <div class="add-text">
-            <span class="add-title">Adicionar novo login</span>
-            <span class="add-subtitle">Nenhum login salvo para este site.</span>
-          </div>
-          <button class="btn-plus">+</button>
-        </div>
-        <div class="list-header-row">
-          <span class="sort-label">Nome do item ⌄</span>
-          <span class="count-label" id="item-count">0 itens</span>
-          <div style="margin-left:auto;display:flex;gap:8px;">
-            <button id="btn-export-csv" class="csv-action-btn" title="Exportar CSV">Exportar</button>
-            <label for="import-csv-input" class="csv-action-btn" style="margin:0;cursor:pointer;">
-              <input type="file" id="import-csv-input" accept=".csv" style="display:none;">
-              <span>Importar</span>
-            </label>
-          </div>
-        </div>
-        <div id="empty-state" class="empty-state hidden">Nenhuma conta encontrada.</div>
-        <ul id="password-list" class="vault-list"></ul>
-        <template id="tpl-vault-item">
-          <li class="vault-item">
-            <div class="item-icon-box"><img src="../assets/internet.svg" alt="" style="width:20px;"></div>
-            <div class="item-info">
-              <span class="item-name"></span>
-              <span class="item-sub"></span>
+        <div>
+          <div class="section-label">SUGERIDO</div>
+          <div class="card add-card" id="btn-add-hero">
+            <div class="item-icon-box placeholder"><img src="../assets/internet.svg" alt="Internet" style="width:20px;height:20px;"></div>
+            <div class="add-text">
+              <span class="add-title">Adicionar novo login</span>
+              <span class="add-subtitle">Nenhum login salvo para este site.</span>
             </div>
-            <div class="item-actions">
-              <button class="btn-icon-action copy-btn" title="Copiar">
-                <img src="../assets/copy.svg" alt="Copiar" style="width:18px;height:18px;vertical-align:middle;">
-              </button>
-              <button class="btn-icon-action launch-btn" title="Abrir">
-                <img src="../assets/open-in-new-window.svg" alt="Abrir site" style="width:18px;height:18px;vertical-align:middle;">
-              </button>
+            <button class="btn-plus">+</button>
+          </div>
+          <div class="list-header-row">
+            <span class="sort-label">Nome do item ⌄</span>
+            <span class="count-label" id="item-count">0 itens</span>
+            <div class="list-actions-group">
+              <button id="btn-export-csv" class="csv-action-btn" title="Exportar CSV">Exportar</button>
+              <button id="btn-import-csv" class="csv-action-btn" type="button">Importar</button>
+              <input type="file" id="import-csv-input" accept=".csv" class="csv-file-input">
             </div>
-          </li>
-        </template>
+          </div>
+          <div id="empty-state" class="empty-state hidden">Nenhuma conta encontrada.</div>
+          <ul id="password-list" class="vault-list"></ul>
+          <template id="tpl-vault-item">
+            <li class="vault-item">
+              <div class="item-icon-box"><img src="../assets/internet.svg" alt="" style="width:20px;"></div>
+              <div class="item-info">
+                <span class="item-name"></span>
+                <span class="item-sub"></span>
+              </div>
+              <div class="item-actions">
+                <button class="btn-icon-action copy-btn" title="Copiar">
+                  <img src="../assets/copy.svg" alt="Copiar" style="width:18px;height:18px;vertical-align:middle;">
+                </button>
+                <button class="btn-icon-action launch-btn" title="Abrir">
+                  <img src="../assets/open-in-new-window.svg" alt="Abrir site" style="width:18px;height:18px;vertical-align:middle;">
+                </button>
+              </div>
+            </li>
+          </template>
+        </div>
+
       </div>
     </main>
 
