@@ -52,9 +52,7 @@ const autofillModule = createAutofillModule({
   domainEl: document.getElementById('current-domain'),
   faviconEl: document.getElementById('current-favicon'),
   autofillStatusEl: document.getElementById('site-status-autofill'),
-  autoLoginStatusEl: document.getElementById('site-status-autologin'),
-  autofillToggleButton: document.getElementById('btn-toggle-autofill'),
-  autoLoginToggleButton: document.getElementById('btn-toggle-autologin')
+  autofillToggleButton: document.getElementById('btn-toggle-autofill')
 });
 
 // --- Navegação ---

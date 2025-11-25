@@ -16,16 +16,13 @@
       </button>
       <button class="nav-item" id="nav-autofill">
         <span class="nav-icon"><img src="../assets/gear-settings.svg" alt="" aria-hidden="true"></span>
-        <span class="nav-label">Auto</span>
+        <span class="nav-label">AutoFill</span>
       </button>
       <button class="nav-item" id="nav-gen">
         <span class="nav-icon"><img src="../assets/stars.svg" alt="" aria-hidden="true"></span>
         <span class="nav-label">Gerador</span>
       </button>
-      <button class="nav-item" id="nav-more">
-        <span class="nav-icon">•••</span>
-        <span class="nav-label">Mais</span>
-      </button>
+
     </nav>
 
     <main id="view-main" class="content-view">
@@ -34,11 +31,6 @@
           <span class="search-icon"><img src="../assets/magnifying-glass.svg" alt="" aria-hidden="true"></span>
           <input type="text" id="search-input" placeholder="Buscar">
         </div>
-      </div>
-      <div class="category-tabs">
-        <button class="tab-pill active">Logins</button>
-        <button class="tab-text">Pagamentos</button>
-        <button class="tab-text">Notas Seguras</button>
       </div>
       <div class="scroll-area">
         <div>
@@ -87,7 +79,7 @@
     <div id="view-autofill" class="content-view hidden">
       <div class="scroll-area">
         <div class="card autofill-card">
-          <h3>Controles por site</h3>
+          <h3>Controles</h3>
           <p class="card-desc">Escolha como este site deve se comportar.</p>
           <div class="site-status-row">
             <img id="current-favicon" src="../assets/internet.svg" class="site-favicon" alt="">
@@ -103,19 +95,6 @@
             </div>
             <button class="btn-pause" id="btn-toggle-autofill">Pausar</button>
           </div>
-          <div class="site-status-row toggle-control">
-            <div class="site-info">
-              <span class="site-domain">Login automático</span>
-              <span class="site-status" id="site-status-autologin">Login automático ativo</span>
-            </div>
-            <button class="btn-pause" id="btn-toggle-autologin">Pausar</button>
-          </div>
-          <a href="#" class="link-arrow">Preferências Globais →</a>
-        </div>
-        <div class="card autofill-card">
-          <h3>Você sabia?</h3>
-          <p class="card-desc">Você pode desativar o Autofill para campos específicos dentro deste site.</p>
-          <a href="#" class="link-external">Saiba mais ↗</a>
         </div>
       </div>
     </div>
@@ -139,19 +118,6 @@
         </div>
 
         <div class="card gen-settings-card">
-          <div class="setting-group">
-            <label class="radio-container">
-              <input type="radio" name="gen-type" value="password" checked>
-              <span class="checkmark-radio"></span>
-              Password
-            </label>
-            <label class="radio-container">
-              <input type="radio" name="gen-type" value="passphrase">
-              <span class="checkmark-radio"></span>
-              Passphrase
-            </label>
-          </div>
-
           <div class="setting-group slider-group">
             <div class="slider-header">
               <span>Length (4 - 40)</span>
@@ -182,11 +148,8 @@
               Similar characters (e.g. 1l| O0 Z2)
             </label>
           </div>
-
-          <button class="btn-save-default" disabled>Save as default</button>
         </div>
 
-        <button class="btn-history">⟲ Show history</button>
 
       </div>
     </div>

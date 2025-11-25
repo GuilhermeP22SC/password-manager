@@ -1,21 +1,20 @@
-/* Botões Importar/Exportar CSV */
-.csv-action-btn {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-left: 4px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  box-shadow: var(--shadow-sm);
-  outline: none;
-  display: inline-flex;
+/* Switch ON/OFF animado */
+.switch-row {
+  display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
+  margin: 10px 0 0 0;
+  font-size: 14px;
+  color: var(--text-main);
 }
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
 .csv-action-btn:hover, .csv-action-btn:focus {
   background: var(--primary);
   color: #fff;

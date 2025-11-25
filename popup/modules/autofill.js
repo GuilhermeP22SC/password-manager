@@ -1,9 +1,4 @@
-import {
-  getPausedSites,
-  savePausedSites,
-  getAutoLoginPausedSites,
-  saveAutoLoginPausedSites
-} from './storage.js';
+import { getPausedSites, savePausedSites } from './storage.js';
 import { setText } from '../utils/dom.js';
 
 const DEFAULT_FAVICON = '../assets/internet.svg';
@@ -13,26 +8,16 @@ export function createAutofillModule(options) {
     domainEl,
     faviconEl,
     autofillStatusEl,
-    autoLoginStatusEl,
-    autofillToggleButton,
-    autoLoginToggleButton
+    autofillToggleButton
   } = options;
   let currentDomain = null;
   let cachedPausedAutofillSites = [];
-  let cachedPausedAutoLoginSites = [];
 
   autofillToggleButton.addEventListener('click', async () => {
     if (!currentDomain) return;
     const isPaused = await domainIsAutofillPaused(currentDomain);
     await setAutofillPaused(currentDomain, !isPaused);
     renderAutofillState(!isPaused);
-  });
-
-  autoLoginToggleButton.addEventListener('click', async () => {
-    if (!currentDomain) return;
-    const isPaused = await domainIsAutoLoginPaused(currentDomain);
-    await setAutoLoginPaused(currentDomain, !isPaused);
-    renderAutoLoginState(!isPaused);
   });
 
   async function refresh() {
@@ -45,22 +30,13 @@ export function createAutofillModule(options) {
     setText(domainEl, currentDomain);
     faviconEl.src = `https://www.google.com/s2/favicons?domain=${currentDomain}&sz=64`;
 
-    const [autofillPaused, autoLoginPaused] = await Promise.all([
-      domainIsAutofillPaused(currentDomain),
-      domainIsAutoLoginPaused(currentDomain)
-    ]);
+    const autofillPaused = await domainIsAutofillPaused(currentDomain);
     renderAutofillState(autofillPaused);
-    renderAutoLoginState(autoLoginPaused);
   }
 
   async function domainIsAutofillPaused(domain) {
     cachedPausedAutofillSites = await getPausedSites();
     return domainInList(cachedPausedAutofillSites, domain);
-  }
-
-  async function domainIsAutoLoginPaused(domain) {
-    cachedPausedAutoLoginSites = await getAutoLoginPausedSites();
-    return domainInList(cachedPausedAutoLoginSites, domain);
   }
 
   async function setAutofillPaused(domain, shouldPause) {
@@ -72,25 +48,10 @@ export function createAutofillModule(options) {
     await savePausedSites(cachedPausedAutofillSites);
   }
 
-  async function setAutoLoginPaused(domain, shouldPause) {
-    cachedPausedAutoLoginSites = toggleDomainInCache(
-      cachedPausedAutoLoginSites,
-      domain,
-      shouldPause
-    );
-    await saveAutoLoginPausedSites(cachedPausedAutoLoginSites);
-  }
-
   function renderAutofillState(isPaused) {
     setText(autofillStatusEl, isPaused ? 'Autofill pausado' : 'Autofill ativo');
     autofillToggleButton.textContent = isPaused ? 'Ativar' : 'Pausar';
     autofillToggleButton.disabled = !currentDomain;
-  }
-
-  function renderAutoLoginState(isPaused) {
-    setText(autoLoginStatusEl, isPaused ? 'Login automático pausado' : 'Login automático ativo');
-    autoLoginToggleButton.textContent = isPaused ? 'Ativar' : 'Pausar';
-    autoLoginToggleButton.disabled = !currentDomain;
   }
 
   function renderUnavailable() {
@@ -98,11 +59,8 @@ export function createAutofillModule(options) {
     setText(domainEl, 'Página desconhecida');
     faviconEl.src = DEFAULT_FAVICON;
     setText(autofillStatusEl, 'Autofill indisponível');
-    setText(autoLoginStatusEl, 'Login automático indisponível');
     autofillToggleButton.textContent = 'Pausar';
-    autoLoginToggleButton.textContent = 'Pausar';
     autofillToggleButton.disabled = true;
-    autoLoginToggleButton.disabled = true;
   }
 
   function domainInList(list, domain) {
@@ -144,7 +102,12 @@ export function createAutofillModule(options) {
     });
   }
 
-  return {
-    refresh
+  const api = {
+    refresh,
+    async getCurrentDomain() {
+      return currentDomain;
+    }
   };
+
+  return api;
 }

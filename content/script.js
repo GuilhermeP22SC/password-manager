@@ -1,21 +1,13 @@
 // script.js - Fluxo "Next Page Prompt"
 
 const AUTOFILL_STORAGE_KEY = 'autofillPausedSites';
-const AUTO_LOGIN_STORAGE_KEY = 'autoLoginPausedSites';
 const PM_ICON_URL = chrome.runtime.getURL('icons/logo.png');
-const AUTO_LOGIN_DELAY = 250;
-
-let autoLoginTimeout = null;
-let hasTriggeredAutoLogin = false;
 
 // --- INICIALIZAÇÃO ---
 (async () => {
   const hostname = window.location.hostname;
 
   const autofillPaused = await isAutofillPaused(hostname);
-  const autoLoginPaused = await isAutoLoginPaused(hostname);
-
-
   if (autofillPaused) return;
 
   injectIconsInFields();
@@ -25,7 +17,7 @@ let hasTriggeredAutoLogin = false;
   try {
     const response = await chrome.runtime.sendMessage({ type: 'GET_LOGIN', url: window.location.href });
     if (response) {
-      fillForm(response, { autoSubmit: !autoLoginPaused });
+      fillForm(response);
     }
   } catch (e) {}
 
@@ -166,8 +158,7 @@ function injectIconsInFields() {
 }
 
 // --- PREENCHIMENTO ---
-function fillForm(credentials = {}, options = {}) {
-  const { autoSubmit = false } = options;
+function fillForm(credentials = {}) {
   const { username = '', password = '' } = credentials;
   let passInput = document.querySelector('input[type="password"]');
   let userInput = document.querySelector('input[autocomplete="username"], input[name*="user"], input[name*="login"]');
@@ -186,12 +177,6 @@ function fillForm(credentials = {}, options = {}) {
   if (userInput && username) { userInput.value = username; triggerEvents(userInput); }
 
   const targetForm = findLoginForm(passInput, userInput);
-  const hasDataToSubmit = Boolean(password || username);
-  const hasTargetFields = Boolean(passInput || userInput);
-
-  if (autoSubmit && hasDataToSubmit && hasTargetFields) {
-    scheduleAutoLogin({ form: targetForm, passwordInput: passInput, usernameInput: userInput });
-  }
 }
 
 function triggerEvents(el) {
@@ -213,55 +198,6 @@ function findLoginForm(passInput, userInput) {
   }
   const explicitForm = document.querySelector('form[action*="login" i], form[action*="signin" i], form[action*="entrar" i], form');
   return explicitForm || null;
-}
-
-function scheduleAutoLogin(context) {
-  if (hasTriggeredAutoLogin) return;
-  hasTriggeredAutoLogin = true;
-  if (autoLoginTimeout) clearTimeout(autoLoginTimeout);
-  autoLoginTimeout = setTimeout(() => {
-    autoLoginTimeout = null;
-    autoLogin(context);
-  }, AUTO_LOGIN_DELAY);
-}
-
-function autoLogin({ form, passwordInput, usernameInput }) {
-  const targetForm = form || passwordInput?.form || usernameInput?.form || passwordInput?.closest('form') || usernameInput?.closest('form');
-  if (targetForm) {
-    if (typeof targetForm.requestSubmit === 'function') {
-      targetForm.requestSubmit();
-      return;
-    }
-    if (typeof targetForm.submit === 'function') {
-      targetForm.submit();
-      return;
-    }
-    targetForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    return;
-  }
-
-  const submitButton = findSubmitButton();
-  if (submitButton) {
-    submitButton.click();
-  }
-}
-
-function findSubmitButton() {
-  const selectors = [
-    'button[type="submit"]',
-    'input[type="submit"]',
-    'button[data-action*="login"]',
-    'button[data-testid*="login"]',
-    'button[name*="login"]',
-    'button[id*="login"]'
-  ];
-  const primary = document.querySelector(selectors.join(','));
-  if (primary) return primary;
-
-  return Array.from(document.querySelectorAll('button, input[type="button"], div[role="button"]')).find((el) => {
-    const label = (el.textContent || el.value || '').toLowerCase();
-    return /entrar|acessar|login|sign in|continuar/.test(label);
-  }) || null;
 }
 
 // --- DETECÇÃO DE LOGIN (ATUALIZADA) ---
@@ -342,20 +278,18 @@ async function isAutofillPaused(domain) {
   return isFeaturePaused(domain, AUTOFILL_STORAGE_KEY);
 }
 
-async function isAutoLoginPaused(domain) {
-  return isFeaturePaused(domain, AUTO_LOGIN_STORAGE_KEY);
-}
-
 async function isFeaturePaused(domain, storageKey) {
   try {
     const data = await chrome.storage.local.get([storageKey]);
     const pausedList = Array.isArray(data[storageKey]) ? data[storageKey] : [];
     const normalizedTarget = normalizeDomain(domain);
-    return pausedList.some(saved => {
+    return pausedList.some((saved) => {
       const normalizedSaved = normalizeDomain(saved);
       return normalizedTarget === normalizedSaved || normalizedTarget.endsWith(`.${normalizedSaved}`);
     });
-  } catch (error) { return false; }
+  } catch (error) {
+    return false;
+  }
 }
 
 function normalizeDomain(domain = '') {
